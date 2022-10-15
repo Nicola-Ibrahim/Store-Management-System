@@ -1,44 +1,47 @@
 
 from accounts import models, services
-from django.contrib.auth import login, authenticate
-from django.urls import reverse_lazy
-
 from rest_framework import exceptions
-from rest_framework import generics, permissions, views, authentication
+from rest_framework import generics, views, permissions
 from rest_framework.response import Response
 
-from . import serializers, authenticatons
+from . import serializers
+from .permissions import OnlyAdminPermissionMixin, StaffPermissionMixin
 
 
 # Create your views here.
-class CustomersListView(generics.ListCreateAPIView):
+class CustomersListView(
+    StaffPermissionMixin,
+    generics.ListCreateAPIView
+    ):
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomersSerializer
-    authentication_classes = [authenticatons.CustomAuth]
-    permission_classes = [permissions.IsAuthenticated]
+    
 
-class CustomerRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class CustomerRetrieveUpdateDestroyView(
+    StaffPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView
+    ):
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomersSerializer
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
 
 
 
-class StaffListView(generics.ListCreateAPIView):
+
+class StaffListView(
+    OnlyAdminPermissionMixin,
+    generics.ListCreateAPIView
+    ):
     queryset = models.Staff.objects.all()
     serializer_class = serializers.StaffSerializer
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
 
 
 
-class StaffRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class StaffRetrieveUpdateDestroyView(
+    OnlyAdminPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView
+    ):
     queryset = models.Staff.objects.all()
     serializer_class = serializers.StaffSerializer
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
-
 
 
 class LoginApi(views.APIView):
@@ -55,6 +58,4 @@ class LoginApi(views.APIView):
             raise exceptions.AuthenticationFailed("Invalid credentials")
 
         token = services.create_token(user.id)
-        response = Response()
-        response.set_cookie(key='jwt', value=token,  httponly=True)
-        return response
+        return Response(token)
