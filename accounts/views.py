@@ -1,16 +1,14 @@
 
-from accounts import models, services
-from rest_framework import exceptions
-from rest_framework import generics, views, permissions
-from rest_framework.response import Response
+from . import models
+from rest_framework import generics
 
 from . import serializers
-from .permissions import OnlyAdminPermissionMixin, StaffPermissionMixin
+from .permissions import OnlyAdminPermissionMixin, OnlyStaffPermissionMixin, IsPresidentTestMixin, IsStaffTestMixin
 
 
 # Create your views here.
 class CustomersListView(
-    StaffPermissionMixin,
+    OnlyStaffPermissionMixin,
     generics.ListCreateAPIView
     ):
     queryset = models.Customer.objects.all()
@@ -18,13 +16,11 @@ class CustomersListView(
     
 
 class CustomerRetrieveUpdateDestroyView(
-    StaffPermissionMixin,
+    OnlyStaffPermissionMixin,
     generics.RetrieveUpdateDestroyAPIView
     ):
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomersSerializer
-
-
 
 
 class StaffListView(
@@ -44,18 +40,3 @@ class StaffRetrieveUpdateDestroyView(
     serializer_class = serializers.StaffSerializer
 
 
-class LoginApi(views.APIView):
-    def post(self, request):
-        username = request.data['username']
-        password = request.data['password']
-
-        user = models.User.objects.filter(username=username).first()
-
-        if(user is None):
-            raise exceptions.AuthenticationFailed("Invalid credentials")
-
-        if(not user.check_password(raw_password=password)):
-            raise exceptions.AuthenticationFailed("Invalid credentials")
-
-        token = services.create_token(user.id)
-        return Response(token)
