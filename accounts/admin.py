@@ -19,18 +19,21 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = "__all__"
+        fields = '__all__'
 
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+
 
     class Meta:
         model = User
         fields = "__all__"
+
+
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -53,6 +56,43 @@ class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
+
+    fieldsets = (
+        (None, {"fields": ("username", "password")}),
+        (
+            ("Personal info"), 
+            {
+                "fields": (
+                    "first_name", 
+                    "last_name", 
+                    "email",
+                    "role",
+                    "state")
+            }),
+        (
+            ("Permissions"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        (("Important dates"), {"fields": ("last_login", "date_joined")}),
+    )
+
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "password1", "password2", "role"),
+            },
+        ),
+    )
 
 
 #  Now register the new UserAdmin...
