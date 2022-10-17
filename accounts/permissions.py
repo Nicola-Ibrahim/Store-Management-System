@@ -1,6 +1,20 @@
 
 from rest_framework import permissions
+from django.contrib.auth.mixins import UserPassesTestMixin
+from . import models
 
+
+
+
+class OnlyAdminPermissionMixin():
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+class IsPresidentTestMixin(UserPassesTestMixin):
+    def test_func(self):
+        role = models.User.Role
+        values = [role.MANAGER, role.PRESIDENT, role.SR_MANAGER]
+        return self.request.user.role in values
+    
 
 
 class OnlyStaff(permissions.DjangoModelPermissions):
@@ -14,9 +28,11 @@ class OnlyStaff(permissions.DjangoModelPermissions):
         'DELETE': ['%(app_label)s.delete_%(model_name)s'],
     }
 
-
-class OnlyAdminPermissionMixin():
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
-
-class StaffPermissionMixin():
+class OnlyStaffPermissionMixin():
     permission_classes = [permissions.IsAuthenticated, OnlyStaff]
+
+class IsStaffTestMixin(UserPassesTestMixin):
+    def test_func(self):
+        role = models.User.Role
+        values = [role.MANAGER, role.PRESIDENT, role.SR_MANAGER, role.STANDARD]
+        return self.request.user.role in values
