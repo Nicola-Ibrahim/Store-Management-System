@@ -1,15 +1,20 @@
-
-import imp
-from .models import Item
+from .models import Product
 from sales.serializers import OrderSerializer
 from rest_framework import serializers
 
 
-class ItemSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
 
+    # Reverse M2M relation
     orders = OrderSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Item
-        fields = ['id', 'name', 'orders']
+        model = Product
+        fields = ['id', 'url', 'name', 'orders']
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
+
+        
 
