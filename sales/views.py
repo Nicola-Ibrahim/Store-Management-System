@@ -1,6 +1,6 @@
 from rest_framework import generics
-from sales.models import Order, OrderItem
-from sales.serializers import OrderSerializer, OrderItemSerializer
+from sales.models import Order
+from sales.serializers import OrderSerializer
 
 
 # Create your views here.
@@ -15,7 +15,3 @@ class OrderRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-
-class OrderItemsListView(generics.ListAPIView):
-    queryset = OrderItem.objects.all()
-    serializer_class = OrderItemSerializer
