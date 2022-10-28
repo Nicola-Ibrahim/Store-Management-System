@@ -5,22 +5,35 @@ from . import models
 
 class CustomersSerializer(serializers.ModelSerializer):
 
-    id = serializers.IntegerField(read_only=True)
-    password = serializers.CharField(write_only=True)
-    
+    # related_orders = s/erializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = models.Customer
-        fields = '__all__'
+        fields = [
+            'username',
+            'pk'
+        ]
+        extra_kwargs = {
+            'password':'write_only'
+        }
+
+    # def get_realated_orders(self, obj):
 
     
 
 class StaffSerializer(serializers.ModelSerializer):
-    
-    id = serializers.IntegerField(read_only=True)
-    password = serializers.CharField(write_only=True)
+
     
     class Meta:
         model = models.Staff
-        fields = "__all__"
+        fields = [
+            'username',
+            'pk'
+        ]
+        extra_kwargs = {
+            'password':'write_only'
+        }
+
+
 
 
