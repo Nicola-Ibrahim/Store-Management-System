@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+from rest_framework import exceptions
 
 
 # Create your models here.
@@ -56,5 +57,13 @@ class Product(models.Model):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
 
+
+    def is_available(self, consume_quantity:int):
+        diff = self.base_quantity - consume_quantity
+
+        # Abort process if the available quantity bellow 0 value
+        if(diff < 0):
+            raise exceptions.ValidationError(f"You exceed the number of available for the {self.name}:{self.base_quantity} / should be {diff} or les")
+    
 
 
