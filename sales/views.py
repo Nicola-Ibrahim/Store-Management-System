@@ -1,4 +1,5 @@
 from rest_framework import generics
+from .filters import OrderFilter
 from sales.models import Order, OrderItem
 from sales.serializers import OrderSerializer, OrderItemSerializer
 
@@ -10,11 +11,14 @@ class OrdersListCreateView(
     """View is responsible for handling order insertion"""
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    filterset_class = OrderFilter
 
 
 class OrderRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+    
 
 class OrderItemsListView(
     generics.ListAPIView
@@ -22,3 +26,5 @@ class OrderItemsListView(
     """View is responsible for handling order-items insertion"""
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
+
+    
